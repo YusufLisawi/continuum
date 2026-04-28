@@ -1,5 +1,4 @@
 import { getDb, setPinned } from "../db.ts";
-import { regenMemory } from "../render.ts";
 
 export function pinCmd(idArg: string, pinned: boolean): void {
   const id = Number(idArg);
@@ -9,6 +8,5 @@ export function pinCmd(idArg: string, pinned: boolean): void {
     console.error(`no flashback #${id}`);
     process.exit(1);
   }
-  regenMemory(db);
   console.log(`#${id} ${pinned ? "pinned" : "unpinned"}`);
 }

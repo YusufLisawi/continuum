@@ -1,5 +1,4 @@
 import { addLink, getDb, removeLink } from "../db.ts";
-import { regenMemory } from "../render.ts";
 import type { LinkKind } from "../types.ts";
 
 const VALID_KINDS: LinkKind[] = ["related", "follows", "contradicts", "refines"];
@@ -20,7 +19,6 @@ export function linkCmd(srcArg: string, dstArg: string, opts: LinkOpts): void {
   const kind = parseKind(opts.kind);
   const db = getDb();
   addLink(db, src, dst, kind);
-  regenMemory(db);
   console.log(`#${src} -[${kind}]-> #${dst}`);
 }
 
@@ -30,6 +28,5 @@ export function unlinkCmd(srcArg: string, dstArg: string, opts: LinkOpts): void 
   const kind = opts.kind ? parseKind(opts.kind) : undefined;
   const db = getDb();
   const n = removeLink(db, src, dst, kind);
-  regenMemory(db);
   console.log(`removed ${n} link(s)`);
 }

@@ -1,6 +1,5 @@
 import { addFlashback, addLink, getDb } from "../db.ts";
 import { currentProject } from "../paths.ts";
-import { regenMemory } from "../render.ts";
 import type { LinkKind } from "../types.ts";
 
 interface AddOpts {
@@ -42,8 +41,6 @@ export async function addCmd(title: string, opts: AddOpts): Promise<void> {
     const linkIds = opts.link.split(",").map((s) => Number(s.trim())).filter(Boolean);
     for (const id of linkIds) addLink(db, fb.id, id, "related" as LinkKind);
   }
-
-  regenMemory(db);
 
   if (opts.json) console.log(JSON.stringify(fb));
   else console.log(`#${fb.id} ${fb.title}`);

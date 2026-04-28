@@ -10,7 +10,7 @@ import { tagAddCmd, tagRmCmd } from "./commands/tag.ts";
 import { pinCmd } from "./commands/pin.ts";
 import { rmCmd } from "./commands/rm.ts";
 import { soulEditCmd, soulPrintCmd } from "./commands/soul.ts";
-import { memoryPrintCmd, memoryRegenCmd } from "./commands/memory.ts";
+import { memoryEditCmd, memoryPrintCmd } from "./commands/memory.ts";
 import { configGetCmd, configSetCmd } from "./commands/config.ts";
 import { hookSessionStartCmd } from "./commands/hook.ts";
 
@@ -89,7 +89,7 @@ prog.command("soul print").describe("Print SOUL.md.").action(soulPrintCmd);
 
 prog.command("memory").describe("Print MEMORY.md.").action(memoryPrintCmd);
 prog.command("memory print").describe("Print MEMORY.md.").action(memoryPrintCmd);
-prog.command("memory regen").describe("Regenerate MEMORY.md.").action(memoryRegenCmd);
+prog.command("memory edit").describe("Edit MEMORY.md in $EDITOR.").action(memoryEditCmd);
 
 prog.command("config get [key]").describe("Read config.").action(configGetCmd);
 prog.command("config set <key> <value>").describe("Write config.").action(configSetCmd);
