@@ -31,10 +31,23 @@ selfmind search "sqlite"
 selfmind show 1
 ```
 
-## Plugin
+## Install as a Claude Code plugin
 
-Symlink this repo into `~/.claude/plugins/` (or use `claude plugin install`)
-to enable the SessionStart hook and skills.
+Inside Claude Code:
+
+```
+/plugin marketplace add <github-user>/selfmind
+/plugin install selfmind@selfmind
+```
+
+Local development (before pushing):
+
+```
+/plugin marketplace add /Users/yusufisawi/Developer/selfmind
+/plugin install selfmind@selfmind
+```
+
+This wires up the SessionStart hook and the three skills (recall / remember / link).
 
 ## Storage
 

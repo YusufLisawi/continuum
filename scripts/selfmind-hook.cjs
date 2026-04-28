@@ -18,12 +18,12 @@ function pickRunner() {
     } catch {}
   }
   // 2. Bun + the bundled source, found relative to this script.
-  const repoBin = path.resolve(__dirname, "..", "..", "src", "bin.ts");
+  const repoBin = path.resolve(__dirname, "..", "src", "bin.ts");
   if (fs.existsSync(repoBin)) {
     return { cmd: "bun", args: [repoBin] };
   }
   // 3. Built dist.
-  const distBin = path.resolve(__dirname, "..", "..", "dist", "bin.js");
+  const distBin = path.resolve(__dirname, "..", "dist", "bin.js");
   if (fs.existsSync(distBin)) {
     return { cmd: process.execPath, args: [distBin] };
   }
