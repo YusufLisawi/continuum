@@ -1,0 +1,18 @@
+{
+  "description": "Selfmind: inject SOUL, MEMORY, and recent flashback titles at session start.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/selfmind-hook.cjs\" session-start",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

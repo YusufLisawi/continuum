@@ -1,0 +1,27 @@
+{
+  "name": "selfmind",
+  "version": "0.1.0",
+  "description": "Minimal persistent memory for Claude Code: SOUL, MEMORY, and a graph of flashbacks.",
+  "type": "module",
+  "bin": {
+    "selfmind": "./dist/bin.js"
+  },
+  "scripts": {
+    "build": "bun build ./src/bin.ts --outdir ./dist --target bun",
+    "dev": "bun ./src/bin.ts",
+    "test": "bun test",
+    "typecheck": "bunx tsc --noEmit"
+  },
+  "dependencies": {
+    "sade": "^1.8.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "license": "MIT",
+  "author": "Youssef El Aissaoui"
+}

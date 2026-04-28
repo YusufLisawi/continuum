@@ -1,0 +1,7 @@
+{
+  "name": "selfmind",
+  "version": "0.1.0",
+  "description": "Minimal persistent memory for Claude Code: SOUL, MEMORY, and a graph of flashbacks.",
+  "author": { "name": "Youssef El Aissaoui" },
+  "license": "MIT"
+}
