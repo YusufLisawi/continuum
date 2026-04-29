@@ -202,7 +202,13 @@ export function getFlashback(db: Database, id: number): Flashback | null {
 
 export function listFlashbacks(
   db: Database,
-  opts: { limit?: number; project?: string; tag?: string; pinned?: boolean } = {},
+  opts: {
+    limit?: number;
+    project?: string;
+    tag?: string;
+    pinned?: boolean;
+    excludePinned?: boolean;
+  } = {},
 ): Flashback[] {
   const limit = opts.limit ?? 30;
   const where: string[] = [];
@@ -212,6 +218,7 @@ export function listFlashbacks(
     params.push(opts.project);
   }
   if (opts.pinned) where.push("f.pinned = 1");
+  else if (opts.excludePinned) where.push("f.pinned = 0");
   let join = "";
   if (opts.tag) {
     join = "JOIN flashback_tags ft ON ft.flashback_id = f.id JOIN tags t ON t.id = ft.tag_id";

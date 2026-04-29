@@ -219,8 +219,10 @@ export function renderSessionContext(db: Database): string {
 
   const total = countFlashbacks(db);
   const pinned = listFlashbacks(db, { pinned: true, limit: 200 });
-  const recent = listFlashbacks(db, { limit: cfg.injectLimit });
-  const recentNonPinned = recent.filter((r) => !r.pinned);
+  const recentNonPinned = listFlashbacks(db, {
+    excludePinned: true,
+    limit: cfg.injectLimit,
+  });
 
   const shownCount = pinned.length + recentNonPinned.length;
   const recentHeader = total === 0
