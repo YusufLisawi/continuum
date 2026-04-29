@@ -191,6 +191,20 @@ total count is shown in the section header — if it says "showing 30 of 142",
 there are 112 older flashbacks not in your context. Pinned flashbacks are
 always visible regardless of recency.
 
+### Snapshot, not live
+
+This entire injection is a **snapshot taken at session start (or at the
+last auto-compaction)**. It does NOT refresh on every prompt. So if you
+add new flashbacks or edit SOUL/MEMORY mid-session, the "Recent" list and
+file contents above will look stale until the next compaction or
+\`/clear\`. You still have the current state in conversation history (you
+just wrote it). To see the live snapshot, run \`selfmind preview\`. To
+list new flashbacks beyond what's shown, run \`selfmind list\`.
+
+In long-running auto-compacting sessions, the snapshot refreshes every
+time the harness compacts, so it stays roughly current without any manual
+action.
+
 To reach what's not shown:
 - \`selfmind search "<q>"\` — BM25 + trigram + fuzzy match across all titles & bodies
 - \`selfmind list --tag <name>\`, \`--project <name>\`, \`--pinned\` — filtered listing
