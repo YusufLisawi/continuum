@@ -205,6 +205,14 @@ In long-running auto-compacting sessions, the snapshot refreshes every
 time the harness compacts, so it stays roughly current without any manual
 action.
 
+If you notice your memory snapshot has drifted significantly from current
+state — many flashbacks added since last compaction, MEMORY.md heavily
+edited, or you're losing track of what's pinned vs recent — you can
+**suggest the user run \`/compact\`** (re-injects everything) or
+\`/clear\` (full reset). You can't trigger compaction yourself; only the
+user can. Don't ask for it routinely, only when staleness is actually
+hurting your responses.
+
 To reach what's not shown:
 - \`selfmind search "<q>"\` — BM25 + trigram + fuzzy match across all titles & bodies
 - \`selfmind list --tag <name>\`, \`--project <name>\`, \`--pinned\` — filtered listing
