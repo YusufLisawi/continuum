@@ -13,6 +13,7 @@ import { soulEditCmd, soulPrintCmd } from "./commands/soul.ts";
 import { memoryEditCmd, memoryPrintCmd } from "./commands/memory.ts";
 import { configGetCmd, configSetCmd } from "./commands/config.ts";
 import { hookSessionStartCmd } from "./commands/hook.ts";
+import { previewCmd } from "./commands/preview.ts";
 
 const prog = sade("selfmind");
 
@@ -34,8 +35,9 @@ prog
 
 prog
   .command("show <id>")
-  .describe("Show a flashback by id.")
+  .describe("Show a flashback by id, plus its linked siblings.")
   .option("--json", "Output JSON")
+  .option("--no-links", "Skip pulling linked sibling flashbacks")
   .action(showCmd);
 
 prog
@@ -93,6 +95,12 @@ prog.command("memory edit").describe("Edit MEMORY.md in $EDITOR.").action(memory
 
 prog.command("config get [key]").describe("Read config.").action(configGetCmd);
 prog.command("config set <key> <value>").describe("Write config.").action(configSetCmd);
+
+prog
+  .command("preview")
+  .describe("Print the exact context that would be injected at session start.")
+  .option("--json", "Output the full hook JSON envelope (what Claude Code receives)")
+  .action(previewCmd);
 
 prog
   .command("hook session-start", "", { default: false })

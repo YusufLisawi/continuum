@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import type { Database } from "bun:sqlite";
-import { listFlashbacks } from "./db.ts";
+import { countFlashbacks, listFlashbacks } from "./db.ts";
 import { ensureHome, memoryPath, readConfig, soulPath } from "./paths.ts";
 import type { Flashback } from "./types.ts";
 
@@ -89,45 +89,126 @@ export function readMemory(): string {
   return readFileSync(memoryPath(), "utf8").trim();
 }
 
-function formatTitleLine(f: Flashback): string {
-  const tagPart = f.tags.length ? ` (${f.tags.join(", ")})` : "";
-  return `- [#${f.id}] ${f.title}${tagPart}`;
+function pad(n: number): string {
+  return n < 10 ? `0${n}` : String(n);
+}
+
+function formatTime(ts: number, withDate: boolean): string {
+  const d = new Date(ts);
+  const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if (!withDate) return time;
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${months[d.getMonth()]} ${pad(d.getDate())} ${time}`;
+}
+
+function startOfDay(ts: number): number {
+  const d = new Date(ts);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+function formatTitleLine(f: Flashback, withDate: boolean): string {
+  const tagPart = f.tags.length ? ` _(${f.tags.join(", ")})_` : "";
+  const ts = formatTime(f.created_at, withDate);
+  return `- [#${f.id}] ${f.title}${tagPart} — ${ts}`;
+}
+
+interface DateBucket {
+  label: string;
+  items: Flashback[];
+  withDate: boolean;
+}
+
+function bucketByDate(items: Flashback[]): DateBucket[] {
+  const now = Date.now();
+  const today = startOfDay(now);
+  const yesterday = today - 24 * 60 * 60 * 1000;
+  const weekAgo = today - 7 * 24 * 60 * 60 * 1000;
+  const monthAgo = today - 30 * 24 * 60 * 60 * 1000;
+
+  const buckets: DateBucket[] = [
+    { label: "Today", items: [], withDate: false },
+    { label: "Yesterday", items: [], withDate: false },
+    { label: "Earlier this week", items: [], withDate: true },
+    { label: "Earlier this month", items: [], withDate: true },
+    { label: "Older", items: [], withDate: true },
+  ];
+
+  for (const f of items) {
+    const t = f.created_at;
+    if (t >= today) buckets[0]!.items.push(f);
+    else if (t >= yesterday) buckets[1]!.items.push(f);
+    else if (t >= weekAgo) buckets[2]!.items.push(f);
+    else if (t >= monthAgo) buckets[3]!.items.push(f);
+    else buckets[4]!.items.push(f);
+  }
+  return buckets.filter((b) => b.items.length > 0);
 }
 
 const OPERATING_MANUAL = `## Operating manual (selfmind)
 
 You have three layers of memory, all visible above:
 
-1. **SOUL.md** — your identity. Always in context. Edit via Write on
-   \`~/.selfmind/SOUL.md\` when the user redefines who you should be.
-2. **MEMORY.md** — user preferences, decisions, and notes. Always in context.
-   Edit via Write on \`~/.selfmind/MEMORY.md\` whenever the user states a
-   preference, makes a decision, or asks you to remember something short.
-3. **Flashbacks (DB)** — only titles are injected (the list below). Use the
-   CLI to search and expand. Use this layer for richer items: bug
-   write-ups, design decisions with reasoning, learnings worth keeping.
+1. **SOUL.md** — when the user changes your identity instructions: name, how
+   to address them, personality, values, communication style. Rare updates,
+   only when they redefine who you are.
+2. **MEMORY.md** — whenever the user states a short persistent preference,
+   decision, or note. "Always do X", "never Y", "we decided Z". Update it
+   immediately via the Write tool on \`~/.selfmind/MEMORY.md\` without asking.
+3. **Flashbacks (CLI)** — when something is too rich for a one-liner: a bug
+   root cause, a design decision with reasoning, a learning worth keeping, a
+   detailed preference. Use \`selfmind add\` to save and \`selfmind search\`
+   when past context is relevant.
+
+**Simple rule:** if it fits in one line → MEMORY.md. If it needs a body →
+flashback. If it's about who you are → SOUL.md.
+
+### What you see vs what exists
+
+The "Recent flashbacks" list above is the **most recent N titles only**
+(default 30, controlled by \`selfmind config set injectLimit <N>\`). The
+total count is shown in the section header — if it says "showing 30 of 142",
+there are 112 older flashbacks not in your context. Pinned flashbacks are
+always visible regardless of recency.
+
+To reach what's not shown:
+- \`selfmind search "<q>"\` — BM25 + trigram + fuzzy match across all titles & bodies
+- \`selfmind list --tag <name>\`, \`--project <name>\`, \`--pinned\` — filtered listing
+- \`selfmind show <id>\` — expand any flashback by id (full body, links, metadata)
+
+Each title line shows \`[#id] title (tags) — time\`. Pinned items are marked ★.
 
 ### Common shortcuts
 
 - \`selfmind add "<title>" --body "..." --tags a,b\`     save a flashback
-- \`selfmind add "<title>" --body "..." --tags preference --pin\`  pinned preference
+- \`selfmind add "<title>" --body "..." --tags preference --pin\`  pinned preference (always visible)
 - \`selfmind show <id>\`                                  expand a flashback
 - \`selfmind search "<q>" [--tag X]\`                     fuzzy + lexical search
 - \`selfmind list --pinned\`                              all pinned flashbacks
 - \`selfmind link <a> <b> --kind refines|follows|contradicts|related\`
 
-### When to use which
+For the full skills (with trigger phrases and examples), see
+\`selfmind-recall\`, \`selfmind-remember\`, \`selfmind-link\`. These shortcuts
+cover ~90% of usage; you don't need to re-read the skills every session.`;
 
-- User says "remember this is short / a preference / a decision" → edit MEMORY.md
-- User says "remember this" with detail, or you discovered a non-obvious
-  root cause / design choice / learning → \`selfmind add\` (flashback)
-- Identity / personality / how-you-think shifts → edit SOUL.md
-- Referencing a past flashback by guess → \`selfmind search\` first
+function renderPinned(items: Flashback[]): string {
+  if (!items.length) return "_no pinned flashbacks_";
+  return items.map((f) => formatTitleLine(f, true)).join("\n");
+}
 
-For the full skill instructions (with examples and trigger phrases), see the
-\`selfmind-recall\`, \`selfmind-remember\`, and \`selfmind-link\` skills — but
-these shortcuts cover ~90% of usage so you don't need to re-read them every
-session.`;
+function renderRecent(items: Flashback[]): string {
+  if (!items.length) {
+    return "_no flashbacks yet — use `selfmind add` to create one_";
+  }
+  const buckets = bucketByDate(items);
+  const out: string[] = [];
+  for (const b of buckets) {
+    out.push(`### ${b.label}`);
+    out.push(b.items.map((f) => formatTitleLine(f, b.withDate)).join("\n"));
+    out.push("");
+  }
+  return out.join("\n").trimEnd();
+}
 
 export function renderSessionContext(db: Database): string {
   const cfg = readConfig();
@@ -135,11 +216,16 @@ export function renderSessionContext(db: Database): string {
   ensureMemory();
   const soul = readSoul();
   const memory = readMemory();
-  const titles = listFlashbacks(db, { limit: cfg.injectLimit });
 
-  const titleLines = titles.length
-    ? titles.map(formatTitleLine).join("\n")
-    : "_no flashbacks yet — use `selfmind add` to create one_";
+  const total = countFlashbacks(db);
+  const pinned = listFlashbacks(db, { pinned: true, limit: 200 });
+  const recent = listFlashbacks(db, { limit: cfg.injectLimit });
+  const recentNonPinned = recent.filter((r) => !r.pinned);
+
+  const shownCount = pinned.length + recentNonPinned.length;
+  const recentHeader = total === 0
+    ? `## Recent flashbacks`
+    : `## Recent flashbacks (showing ${shownCount} of ${total} total)`;
 
   return [
     "# Selfmind",
@@ -150,8 +236,11 @@ export function renderSessionContext(db: Database): string {
     "## MEMORY",
     memory || "_MEMORY.md is empty_",
     "",
-    `## Recent flashbacks (last ${cfg.injectLimit})`,
-    titleLines,
+    "## Pinned flashbacks (always visible)",
+    renderPinned(pinned),
+    "",
+    recentHeader,
+    renderRecent(recentNonPinned),
     "",
     OPERATING_MANUAL,
   ].join("\n");
