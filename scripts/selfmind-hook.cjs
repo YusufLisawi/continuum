@@ -31,21 +31,15 @@ function pickRunner() {
 }
 
 function emitEmpty() {
-  const empty = {
-    hookSpecificOutput: {
-      hookEventName: "SessionStart",
-      additionalContext: "",
-    },
-    continue: true,
-    suppressOutput: true,
-  };
-  process.stdout.write(JSON.stringify(empty));
+  process.stdout.write(JSON.stringify({ continue: true, suppressOutput: true }));
 }
+
+const KNOWN_HOOK_EVENTS = new Set(["session-start", "stop"]);
 
 function main() {
   const sub = process.argv.slice(2);
   if (sub.length === 0) sub.push("hook", "session-start");
-  else if (sub[0] === "session-start") sub.unshift("hook");
+  else if (KNOWN_HOOK_EVENTS.has(sub[0])) sub.unshift("hook");
 
   const runner = pickRunner();
   if (!runner) {

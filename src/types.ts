@@ -46,8 +46,14 @@ export interface Link {
 
 export interface Config {
   injectLimit: number;
+  contextWindow: number;
+  tokenStatusEnabled: boolean;
+  tokenStatusThreshold: number;
 }
 
 export const DEFAULT_CONFIG: Config = {
   injectLimit: 30,
+  contextWindow: 200000,
+  tokenStatusEnabled: true,
+  tokenStatusThreshold: 0,
 };

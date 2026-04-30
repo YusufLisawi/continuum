@@ -213,6 +213,21 @@ edited, or you're losing track of what's pinned vs recent — you can
 user can. Don't ask for it routinely, only when staleness is actually
 hurting your responses.
 
+### Live context usage
+
+After every assistant response, selfmind injects a one-line status like:
+
+\`\`\`
+Selfmind context: 47,832 / 200,000 tokens (24%) [claude-opus-4-7]
+\`\`\`
+
+Use it to manage your own context budget. When you cross **~75%**, it
+appends "consider /compact" — at that point, gently suggest the user
+compact or wrap up the current sub-thread. Don't mention the line on
+every turn; only when the user asks "how much context?" or when usage
+becomes load-bearing for a decision (e.g. choosing to delegate heavy
+work to a subagent because parent context is tight).
+
 To reach what's not shown:
 - \`selfmind search "<q>"\` — BM25 + trigram + fuzzy match across all titles & bodies
 - \`selfmind list --tag <name>\`, \`--project <name>\`, \`--pinned\` — filtered listing
