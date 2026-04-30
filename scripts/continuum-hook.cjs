@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Thin wrapper. Tries `selfmind` on PATH first, then falls back to running
+// Thin wrapper. Tries `continuum` on PATH first, then falls back to running
 // the source via bun out of this repo (useful during development).
 "use strict";
 const { spawn } = require("node:child_process");
@@ -7,10 +7,10 @@ const path = require("node:path");
 const fs = require("node:fs");
 
 function pickRunner() {
-  // 1. Globally-installed `selfmind` binary (after `bun link`).
+  // 1. Globally-installed `continuum` binary (after `bun link`).
   const PATH = (process.env.PATH || "").split(path.delimiter);
   for (const dir of PATH) {
-    const p = path.join(dir, "selfmind");
+    const p = path.join(dir, "continuum");
     try {
       if (fs.existsSync(p) && fs.statSync(p).isFile()) {
         return { cmd: p, args: [] };

@@ -1,62 +1,164 @@
-# selfmind
+# Continuum
 
-Minimal persistent memory for Claude Code.
+> The thread that runs through every session.
 
-Two markdown files and a graph of flashbacks. No embeddings, no LLM step, no
-MCP server, no workers.
+**Continuum** is persistent memory for Claude Code. Your AI assistant
+remembers who you are, what you've decided, and the work you've done —
+across sessions, across compactions, across machines.
 
-- **SOUL.md** — the agent's identity and consciousness, hand-curated.
-- **MEMORY.md** — auto-regenerated index of pinned items + recent flashback titles.
-- **Flashbacks** — DB-backed memory entries with title, body, tags, and links
-  to other flashbacks.
+No embeddings. No LLM compression step. No MCP server. No workers.
+Just SQLite (FTS5 + trigram + Sørensen-Dice), two markdown files,
+a tiny CLI, and one Claude Code plugin.
 
-A SessionStart hook injects SOUL → MEMORY → last N flashback titles into the
-agent's context. The agent expands and searches the rest agentically via the
-`selfmind` CLI.
+```
+   past ─────────────●──────●─●────────────●────●──── now ─────►
+                     │      │ │            │    │
+                     └──────┴─┴──flashbacks┴────┘
+                                                    + SOUL  (identity)
+                                                    + MEMORY (preferences)
+```
 
-## Install
+---
+
+## What it gives the agent at every session start
+
+1. **SOUL.md** — your identity for this user (name, voice, values).
+   Hand-curated. The agent boots already knowing who it is to you.
+2. **MEMORY.md** — your living preferences, decisions, notes. Always in
+   context. The agent edits this directly as you state preferences.
+3. **Flashbacks** — DB-backed memory entries with title, body, tags, and
+   links to other flashbacks. Last N titles + all pinned are injected;
+   the rest is one CLI call away.
+4. **An operating manual** — locked-in stance: assistant-first, fully
+   agentic, trusts the user, doesn't break character.
+
+A SessionStart hook stitches all of that into the agent's context on
+every fresh session, every `/clear`, and every auto-compaction.
+
+---
+
+## Install (CLI)
 
 ```sh
+git clone https://github.com/<your-user>/continuum ~/Developer/continuum
+cd ~/Developer/continuum
 bun install
 bun run build
 bun link
+continuum --help
 ```
 
-## Quickstart
+Or live-linked (every source change is picked up without rebuilding):
 
 ```sh
-selfmind init
-selfmind add "We use bun:sqlite, not better-sqlite3" --tags decision,stack
-selfmind search "sqlite"
-selfmind show 1
+printf '#!/bin/sh\nexec bun ~/Developer/continuum/src/bin.ts "$@"\n' > ~/.bun/bin/continuum
+chmod +x ~/.bun/bin/continuum
 ```
 
-## Install as a Claude Code plugin
+## Install (Claude Code plugin)
 
 Inside Claude Code:
 
 ```
-/plugin marketplace add <github-user>/selfmind
-/plugin install selfmind@selfmind
+/plugin marketplace add <your-user>/continuum
+/plugin install continuum@continuum
 ```
 
-Local development (before pushing):
+For local development before pushing:
 
 ```
-/plugin marketplace add /Users/yusufisawi/Developer/selfmind
-/plugin install selfmind@selfmind
+/plugin marketplace add /absolute/path/to/continuum
+/plugin install continuum@continuum
 ```
 
-This wires up the SessionStart hook and the three skills (recall / remember / link).
+That wires the SessionStart hook and registers the `continuum` skill
+(with deep references for recall / remember / link). No further setup.
+
+---
+
+## Quickstart
+
+```sh
+continuum init                                            # scaffold ~/.continuum/
+continuum add "We use bun:sqlite, not better-sqlite3" \
+  --body "Built-in, no native build step, FTS5+trigram out of box." \
+  --tags decision,stack
+continuum search "sqlite"                                  # BM25 + fuzzy
+continuum show 1                                            # full body + linked siblings
+continuum preview                                           # see exact session-start injection
+```
+
+## CLI surface
+
+```
+continuum init
+continuum add "<title>" [--body "..."|--stdin] [--tags a,b] [--pin] [--link <id>]
+continuum show <id> [--json] [--no-links]
+continuum search "<q>" [--tag X] [--project Y] [--limit N] [--json]
+continuum list [--limit N] [--tag X] [--project Y] [--pinned] [--json]
+continuum link <src> <dst> --kind related|follows|contradicts|refines
+continuum unlink <src> <dst> [--kind <k>]
+continuum tag add|rm <id> <name>
+continuum pin|unpin <id>
+continuum rm <id>
+continuum soul [print|edit]
+continuum memory [print|edit]
+continuum config get|set <key> [<value>]
+continuum preview                            # what gets injected at SessionStart
+```
+
+## How search works
+
+Three signals merged, no embeddings:
+
+| Layer | Mechanism | Weight |
+|---|---|---|
+| FTS5 BM25 | `bm25(flashbacks_fts)` over title+body, porter stemming | × 1.0 |
+| FTS5 trigram | substring match on title | × 0.5 |
+| Sørensen-Dice fuzzy | per-word JS bigram overlap, falls back when lexical is thin | × 0.5 |
+| Recency | `exp(-age_days/30) × 0.2` | additive |
+| Pinned | `+0.5` | additive |
+
+So `continuum search "dashbord"` still finds *Dashboard log pane resets on refresh*; `continuum search "auth bug"` ranks an actual bug write-up above tangentially-related notes.
 
 ## Storage
 
-Everything lives at `~/.selfmind/`:
+Everything lives at `~/.continuum/`:
 
 ```
-~/.selfmind/
-├── SOUL.md       # hand-edited
-├── MEMORY.md     # auto-regenerated
-├── selfmind.db   # SQLite (FTS5 + trigram)
-└── config.json
+~/.continuum/
+├── SOUL.md         # hand-edited (or by the agent at user request)
+├── MEMORY.md       # hand-edited (preferences, decisions, notes)
+├── continuum.db    # SQLite (flashbacks + tags + links + FTS5)
+└── config.json     # { injectLimit: 30, ... }
 ```
+
+Personal use, local FS only. Nothing leaves your machine unless you
+push the database somewhere yourself.
+
+## Configuration
+
+```sh
+continuum config get                       # all settings
+continuum config set injectLimit 50         # default 30
+```
+
+## Philosophy
+
+Continuum is intentionally **minimal**.
+
+- **No embeddings** — BM25 + trigram + dice is enough for personal
+  scale (hundreds to thousands of flashbacks). One less moving part.
+- **No LLM compression** — the agent decides what's worth saving. We
+  don't summarize automatically.
+- **No MCP server** — a CLI + a SessionStart hook is the whole surface.
+- **No multi-user** — this is your assistant's brain. Personal use.
+- **No automatic flashback writes from hooks** — the agent calls
+  `continuum add` deliberately, so you stay in control of what gets
+  remembered.
+
+The whole thing is ~1.5 kloc of TypeScript and one SQLite database.
+
+## License
+
+MIT.

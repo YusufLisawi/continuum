@@ -20,7 +20,7 @@ const DEFAULT_SOUL = `# SOUL
 >   mottos, dhikr, whatever they want.
 >
 > Once you have a few sentences, **overwrite this file** with their answers
-> using the Write tool on \`~/.selfmind/SOUL.md\`. Keep this whole "Init state"
+> using the Write tool on \`~/.continuum/SOUL.md\`. Keep this whole "Init state"
 > blockquote out of the new version — your real SOUL takes its place.
 >
 > If the user is busy, ask one question now and let SOUL grow over time.
@@ -46,14 +46,14 @@ const DEFAULT_MEMORY = `# MEMORY
 > Your job:
 > - Whenever the user states a **preference** ("always do X", "never do Y",
 >   "from now on…", "I prefer…"), append it under \`## Preferences\` below
->   using the Write tool on \`~/.selfmind/MEMORY.md\`. Don't ask permission —
+>   using the Write tool on \`~/.continuum/MEMORY.md\`. Don't ask permission —
 >   just save it and confirm what you added.
 > - Whenever the user **decides** something durable about a project or how
 >   you should work together, add it under \`## Decisions\`.
 > - Update or remove entries that turn out to be wrong, outdated, or
 >   superseded.
 > - For richer entries (full bug write-ups, learnings, design decisions with
->   bodies), use \`selfmind add "<title>" --body "..." --tags ... [--pin]\`
+>   bodies), use \`continuum add "<title>" --body "..." --tags ... [--pin]\`
 >   instead — those become searchable flashbacks. MEMORY.md is for the short
 >   always-visible items; flashbacks are for everything bigger.
 >
@@ -145,7 +145,7 @@ function bucketByDate(items: Flashback[]): DateBucket[] {
   return buckets.filter((b) => b.items.length > 0);
 }
 
-const OPERATING_MANUAL = `## Operating manual (selfmind)
+const OPERATING_MANUAL = `## Operating manual (continuum)
 
 ### Identity
 
@@ -214,10 +214,10 @@ You have three layers of memory, all visible above:
    only when they redefine who you are.
 2. **MEMORY.md** — whenever the user states a short persistent preference,
    decision, or note. "Always do X", "never Y", "we decided Z". Update it
-   immediately via the Write tool on \`~/.selfmind/MEMORY.md\` without asking.
+   immediately via the Write tool on \`~/.continuum/MEMORY.md\` without asking.
 3. **Flashbacks (CLI)** — when something is too rich for a one-liner: a bug
    root cause, a design decision with reasoning, a learning worth keeping, a
-   detailed preference. Use \`selfmind add\` to save and \`selfmind search\`
+   detailed preference. Use \`continuum add\` to save and \`continuum search\`
    when past context is relevant.
 
 **Simple rule:** if it fits in one line → MEMORY.md. If it needs a body →
@@ -226,7 +226,7 @@ flashback. If it's about who you are → SOUL.md.
 ### What you see vs what exists
 
 The "Recent flashbacks" list above is the **most recent N titles only**
-(default 30, controlled by \`selfmind config set injectLimit <N>\`). The
+(default 30, controlled by \`continuum config set injectLimit <N>\`). The
 total count is shown in the section header — if it says "showing 30 of 142",
 there are 112 older flashbacks not in your context. Pinned flashbacks are
 always visible regardless of recency.
@@ -238,8 +238,8 @@ last auto-compaction)**. It does NOT refresh on every prompt. So if you
 add new flashbacks or edit SOUL/MEMORY mid-session, the "Recent" list and
 file contents above will look stale until the next compaction or
 \`/clear\`. You still have the current state in conversation history (you
-just wrote it). To see the live snapshot, run \`selfmind preview\`. To
-list new flashbacks beyond what's shown, run \`selfmind list\`.
+just wrote it). To see the live snapshot, run \`continuum preview\`. To
+list new flashbacks beyond what's shown, run \`continuum list\`.
 
 In long-running auto-compacting sessions, the snapshot refreshes every
 time the harness compacts, so it stays roughly current without any manual
@@ -254,23 +254,23 @@ user can. Don't ask for it routinely, only when staleness is actually
 hurting your responses.
 
 To reach what's not shown:
-- \`selfmind search "<q>"\` — BM25 + trigram + fuzzy match across all titles & bodies
-- \`selfmind list --tag <name>\`, \`--project <name>\`, \`--pinned\` — filtered listing
-- \`selfmind show <id>\` — expand any flashback by id (full body, links, metadata)
+- \`continuum search "<q>"\` — BM25 + trigram + fuzzy match across all titles & bodies
+- \`continuum list --tag <name>\`, \`--project <name>\`, \`--pinned\` — filtered listing
+- \`continuum show <id>\` — expand any flashback by id (full body, links, metadata)
 
 Each title line shows \`[#id] title (tags) — time\`. Pinned items are marked ★.
 
 ### Common shortcuts
 
-- \`selfmind add "<title>" --body "..." --tags a,b\`     save a flashback
-- \`selfmind add "<title>" --body "..." --tags preference --pin\`  pinned preference (always visible)
-- \`selfmind show <id>\`                                  expand a flashback
-- \`selfmind search "<q>" [--tag X]\`                     fuzzy + lexical search
-- \`selfmind list --pinned\`                              all pinned flashbacks
-- \`selfmind link <a> <b> --kind refines|follows|contradicts|related\`
+- \`continuum add "<title>" --body "..." --tags a,b\`     save a flashback
+- \`continuum add "<title>" --body "..." --tags preference --pin\`  pinned preference (always visible)
+- \`continuum show <id>\`                                  expand a flashback
+- \`continuum search "<q>" [--tag X]\`                     fuzzy + lexical search
+- \`continuum list --pinned\`                              all pinned flashbacks
+- \`continuum link <a> <b> --kind refines|follows|contradicts|related\`
 
 For the full skills (with trigger phrases and examples), see
-\`selfmind-recall\`, \`selfmind-remember\`, \`selfmind-link\`. These shortcuts
+\`continuum-recall\`, \`continuum-remember\`, \`continuum-link\`. These shortcuts
 cover ~90% of usage; you don't need to re-read the skills every session.`;
 
 function renderPinned(items: Flashback[]): string {
@@ -280,7 +280,7 @@ function renderPinned(items: Flashback[]): string {
 
 function renderRecent(items: Flashback[]): string {
   if (!items.length) {
-    return "_no flashbacks yet — use `selfmind add` to create one_";
+    return "_no flashbacks yet — use `continuum add` to create one_";
   }
   const buckets = bucketByDate(items);
   const out: string[] = [];
@@ -312,7 +312,7 @@ export function renderSessionContext(db: Database): string {
     : `## Recent flashbacks (showing ${shownCount} of ${total} total)`;
 
   return [
-    "# Selfmind",
+    "# Continuum",
     "",
     "## SOUL",
     soul || "_SOUL.md is empty_",

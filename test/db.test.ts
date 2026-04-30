@@ -16,16 +16,16 @@ import {
 } from "../src/db.ts";
 
 function freshHome(): string {
-  const dir = mkdtempSync(join(tmpdir(), "selfmind-test-"));
-  process.env.SELFMIND_HOME = dir;
+  const dir = mkdtempSync(join(tmpdir(), "continuum-test-"));
+  process.env.CONTINUUM_HOME = dir;
   closeDb();
   return dir;
 }
 
 afterEach(() => {
   closeDb();
-  if (process.env.SELFMIND_HOME?.startsWith(tmpdir())) {
-    rmSync(process.env.SELFMIND_HOME, { recursive: true, force: true });
+  if (process.env.CONTINUUM_HOME?.startsWith(tmpdir())) {
+    rmSync(process.env.CONTINUUM_HOME, { recursive: true, force: true });
   }
 });
 

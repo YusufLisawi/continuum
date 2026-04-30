@@ -36,12 +36,12 @@ function buildVisibleSummary(
   total: number,
 ): string {
   if (total === 0) {
-    return "selfmind: no flashbacks yet — `selfmind add \"<title>\" --tags ...` to start";
+    return "continuum: no flashbacks yet — `continuum add \"<title>\" --tags ...` to start";
   }
 
   const lines: string[] = [];
   lines.push(
-    `selfmind: ${total} total flashback${total === 1 ? "" : "s"} (${pinned.length} pinned, ${recent.length} recent)`,
+    `continuum: ${total} total flashback${total === 1 ? "" : "s"} (${pinned.length} pinned, ${recent.length} recent)`,
   );
 
   let shown = 0;
@@ -60,7 +60,7 @@ function buildVisibleSummary(
 
   const remaining = pinned.length + recent.length - shown;
   if (remaining > 0) {
-    lines.push(`  …and ${remaining} more — \`selfmind preview\` for the full injection`);
+    lines.push(`  …and ${remaining} more — \`continuum preview\` for the full injection`);
   }
   return lines.join("\n");
 }
@@ -81,8 +81,8 @@ export async function hookSessionStartCmd(): Promise<void> {
     });
     summary = buildVisibleSummary(pinned, recent, total);
   } catch (err) {
-    context = `# Selfmind\n\n_failed to render context: ${(err as Error).message}_`;
-    summary = `selfmind: failed to inject — ${(err as Error).message}`;
+    context = `# Continuum\n\n_failed to render context: ${(err as Error).message}_`;
+    summary = `continuum: failed to inject — ${(err as Error).message}`;
   }
   const out: HookOutput = {
     hookSpecificOutput: {

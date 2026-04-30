@@ -7,8 +7,8 @@ export function initCmd(_opts: Record<string, unknown>): void {
   ensureSoul();
   ensureMemory();
   getDb();
-  console.log(`selfmind initialized at ${home()}`);
+  console.log(`continuum initialized at ${home()}`);
   console.log(`  - SOUL.md  (init prompt — agent will fill on first session)`);
   console.log(`  - MEMORY.md (init prompt — agent edits as preferences emerge)`);
-  console.log(`  - selfmind.db`);
+  console.log(`  - continuum.db`);
 }

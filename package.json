@@ -1,10 +1,10 @@
 {
-  "name": "selfmind",
+  "name": "continuum",
   "version": "0.1.0",
   "description": "Minimal persistent memory for Claude Code: SOUL, MEMORY, and a graph of flashbacks.",
   "type": "module",
   "bin": {
-    "selfmind": "./dist/bin.js"
+    "continuum": "./dist/bin.js"
   },
   "scripts": {
     "build": "bun build ./src/bin.ts --outdir ./dist --target bun",

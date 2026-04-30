@@ -2,7 +2,7 @@
 
 ## Search internals
 
-Selfmind search merges three signals:
+Continuum search merges three signals:
 
 1. **FTS5 lexical (BM25)** on `title + body` with porter stemming —
    `commits` matches `commit`, `dashboards` matches `dashboard`. Each term
@@ -17,15 +17,15 @@ added to the merged score.
 ## Filters
 
 ```sh
-selfmind search "auth" --tag bug                # tag filter
-selfmind search "auth" --project viberelay       # cwd-basename filter
-selfmind search "auth" --limit 5
-selfmind search "auth" --json                    # for parsing in tools
+continuum search "auth" --tag bug                # tag filter
+continuum search "auth" --project viberelay       # cwd-basename filter
+continuum search "auth" --limit 5
+continuum search "auth" --json                    # for parsing in tools
 ```
 
 ## Traversing the graph
 
-`selfmind show <id>` already pulls all linked siblings inline:
+`continuum show <id>` already pulls all linked siblings inline:
 
 ```
 #2  Dashboard log pane resets on refresh
@@ -50,5 +50,5 @@ Cheaper alternatives if the answer is already in front of you:
 
 - The injected MEMORY.md often has the preference verbatim — read first.
 - The injected flashback titles list often shows the answer by id — go
-  straight to `selfmind show <id>`.
+  straight to `continuum show <id>`.
 - Search only when neither of the above hits.

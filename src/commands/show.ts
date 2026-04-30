@@ -76,7 +76,7 @@ export function showCmd(idArg: string, opts: ShowOpts): void {
       console.log(`  ${arrow} #${n.id} (${n.kind})  ${n.title}${tagPart}`);
     }
     console.log(
-      `  (use \`selfmind show <id>\` to expand any of these — full graph context)`,
+      `  (use \`continuum show <id>\` to expand any of these — full graph context)`,
     );
   }
   // Suppress unused-var warning when --no-links elides neighbors.

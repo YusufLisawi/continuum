@@ -1,6 +1,6 @@
 # Link — deeper
 
-Selfmind is a small typed graph. Edges are directed; types matter.
+Continuum is a small typed graph. Edges are directed; types matter.
 
 ## The four kinds
 
@@ -15,32 +15,32 @@ Selfmind is a small typed graph. Edges are directed; types matter.
 
 ```sh
 # Bug landed a fix:
-selfmind add "Dashboard log fix landed v0.2" --tags fix,viberelay
-selfmind link <new-id> <bug-id> --kind follows
+continuum add "Dashboard log fix landed v0.2" --tags fix,viberelay
+continuum link <new-id> <bug-id> --kind follows
 
 # Decision changed:
-selfmind add "Switched to better-sqlite3 after build pipeline change" --tags decision,stack
-selfmind link <new-id> <old-decision-id> --kind refines
+continuum add "Switched to better-sqlite3 after build pipeline change" --tags decision,stack
+continuum link <new-id> <old-decision-id> --kind refines
 
 # Conflicting opinions in two places:
-selfmind link <a-id> <b-id> --kind contradicts
+continuum link <a-id> <b-id> --kind contradicts
 ```
 
 ## Reading the graph
 
-`selfmind show <id>` always pulls direct neighbors with their direction:
+`continuum show <id>` always pulls direct neighbors with their direction:
 
 - `→ #N (kind)` — outgoing (this flashback is the source)
 - `← #N (kind)` — incoming (this flashback is the destination)
 
-Walk further by calling `show` on any neighbor. Selfmind doesn't do
+Walk further by calling `show` on any neighbor. Continuum doesn't do
 multi-hop traversal — keeping recall predictable and cheap.
 
 ## Removing links
 
 ```sh
-selfmind unlink <src> <dst>                  # all kinds between this pair
-selfmind unlink <src> <dst> --kind refines   # just one kind
+continuum unlink <src> <dst>                  # all kinds between this pair
+continuum unlink <src> <dst> --kind refines   # just one kind
 ```
 
 ## Anti-patterns

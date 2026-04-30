@@ -1,5 +1,5 @@
 {
-  "description": "Selfmind: inject SOUL, MEMORY, and recent flashback titles at session start.",
+  "description": "Continuum: inject SOUL, MEMORY, and recent flashback titles at session start.",
   "hooks": {
     "SessionStart": [
       {
@@ -8,7 +8,7 @@
           {
             "type": "command",
             "shell": "bash",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/selfmind-hook.cjs\" session-start",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/continuum-hook.cjs\" session-start",
             "timeout": 15
           }
         ]

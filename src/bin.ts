@@ -15,11 +15,11 @@ import { configGetCmd, configSetCmd } from "./commands/config.ts";
 import { hookSessionStartCmd } from "./commands/hook.ts";
 import { previewCmd } from "./commands/preview.ts";
 
-const prog = sade("selfmind");
+const prog = sade("continuum");
 
 prog.version("0.1.0").describe("Minimal persistent memory for Claude Code.");
 
-prog.command("init").describe("Scaffold ~/.selfmind/.").action(initCmd);
+prog.command("init").describe("Scaffold ~/.continuum/.").action(initCmd);
 
 prog
   .command("add <title>")

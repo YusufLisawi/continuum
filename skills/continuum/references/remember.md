@@ -29,7 +29,7 @@ Multiple tags are fine: `--tags decision,stack,viberelay`.
 Before saving, search for similar titles:
 
 ```sh
-selfmind search "<a few keywords>" --limit 5
+continuum search "<a few keywords>" --limit 5
 ```
 
 If you find a near-duplicate:
@@ -52,7 +52,7 @@ Future-you needs *why* to judge edge cases, not just *what*.
 ## Multi-line bodies
 
 ```sh
-selfmind add "Dashboard log pane resets on refresh" --body "$(cat <<'EOF'
+continuum add "Dashboard log pane resets on refresh" --body "$(cat <<'EOF'
 Refresh loop replaces #app-body wholesale, which wipes the log pane and
 follow-state.
 

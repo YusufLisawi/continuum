@@ -1,11 +1,11 @@
 {
-  "name": "selfmind",
+  "name": "continuum",
   "owner": {
     "name": "Youssef El Aissaoui"
   },
   "plugins": [
     {
-      "name": "selfmind",
+      "name": "continuum",
       "source": "./",
       "description": "Minimal persistent memory for Claude Code: SOUL, MEMORY, and a graph of flashbacks.",
       "version": "0.1.0"

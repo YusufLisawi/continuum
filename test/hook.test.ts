@@ -7,20 +7,20 @@ import { renderSessionContext } from "../src/render.ts";
 
 afterEach(() => {
   closeDb();
-  if (process.env.SELFMIND_HOME?.startsWith(tmpdir())) {
-    rmSync(process.env.SELFMIND_HOME, { recursive: true, force: true });
+  if (process.env.CONTINUUM_HOME?.startsWith(tmpdir())) {
+    rmSync(process.env.CONTINUUM_HOME, { recursive: true, force: true });
   }
 });
 
 describe("session context render", () => {
   test("includes SOUL, MEMORY, and recent titles", () => {
-    process.env.SELFMIND_HOME = mkdtempSync(join(tmpdir(), "selfmind-render-"));
+    process.env.CONTINUUM_HOME = mkdtempSync(join(tmpdir(), "continuum-render-"));
     closeDb();
     const db = getDb();
     addFlashback(db, { title: "First note", tags: ["t1"] });
     addFlashback(db, { title: "Second note" });
     const ctx = renderSessionContext(db);
-    expect(ctx).toContain("# Selfmind");
+    expect(ctx).toContain("# Continuum");
     expect(ctx).toContain("## SOUL");
     expect(ctx).toContain("## MEMORY");
     expect(ctx).toContain("## Recent flashbacks");
@@ -29,7 +29,7 @@ describe("session context render", () => {
   });
 
   test("empty DB still renders valid context", () => {
-    process.env.SELFMIND_HOME = mkdtempSync(join(tmpdir(), "selfmind-empty-"));
+    process.env.CONTINUUM_HOME = mkdtempSync(join(tmpdir(), "continuum-empty-"));
     closeDb();
     const db = getDb();
     const ctx = renderSessionContext(db);
@@ -40,9 +40,9 @@ describe("session context render", () => {
 
 describe("hook stdout contract", () => {
   test("emits hookSpecificOutput JSON", async () => {
-    const home = mkdtempSync(join(tmpdir(), "selfmind-hook-"));
+    const home = mkdtempSync(join(tmpdir(), "continuum-hook-"));
     const proc = Bun.spawn(["bun", "src/bin.ts", "hook", "session-start"], {
-      env: { ...process.env, SELFMIND_HOME: home },
+      env: { ...process.env, CONTINUUM_HOME: home },
       stdin: "pipe",
       stdout: "pipe",
       cwd: import.meta.dir.replace(/\/test$/, ""),

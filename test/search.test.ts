@@ -6,15 +6,15 @@ import { addFlashback, closeDb, getDb } from "../src/db.ts";
 import { search } from "../src/search.ts";
 
 function freshHome(): void {
-  const dir = mkdtempSync(join(tmpdir(), "selfmind-search-"));
-  process.env.SELFMIND_HOME = dir;
+  const dir = mkdtempSync(join(tmpdir(), "continuum-search-"));
+  process.env.CONTINUUM_HOME = dir;
   closeDb();
 }
 
 afterEach(() => {
   closeDb();
-  if (process.env.SELFMIND_HOME?.startsWith(tmpdir())) {
-    rmSync(process.env.SELFMIND_HOME, { recursive: true, force: true });
+  if (process.env.CONTINUUM_HOME?.startsWith(tmpdir())) {
+    rmSync(process.env.CONTINUUM_HOME, { recursive: true, force: true });
   }
 });
 

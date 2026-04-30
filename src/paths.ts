@@ -4,11 +4,11 @@ import { mkdirSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { DEFAULT_CONFIG, type Config } from "./types.ts";
 
 export function home(): string {
-  return process.env.SELFMIND_HOME || join(homedir(), ".selfmind");
+  return process.env.CONTINUUM_HOME || join(homedir(), ".continuum");
 }
 
 export function dbPath(): string {
-  return join(home(), "selfmind.db");
+  return join(home(), "continuum.db");
 }
 
 export function soulPath(): string {
