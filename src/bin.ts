@@ -13,7 +13,6 @@ import { soulEditCmd, soulPrintCmd } from "./commands/soul.ts";
 import { memoryEditCmd, memoryPrintCmd } from "./commands/memory.ts";
 import { configGetCmd, configSetCmd } from "./commands/config.ts";
 import { hookSessionStartCmd } from "./commands/hook.ts";
-import { hookStopCmd } from "./commands/hookStop.ts";
 import { previewCmd } from "./commands/preview.ts";
 
 const prog = sade("selfmind");
@@ -108,13 +107,6 @@ prog
   .describe("Internal: emit SessionStart context JSON for Claude Code.")
   .action(() => {
     void hookSessionStartCmd();
-  });
-
-prog
-  .command("hook stop", "", { default: false })
-  .describe("Internal: emit Stop hook context-usage line for Claude Code.")
-  .action(() => {
-    void hookStopCmd();
   });
 
 prog.parse(process.argv);

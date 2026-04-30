@@ -34,12 +34,10 @@ function emitEmpty() {
   process.stdout.write(JSON.stringify({ continue: true, suppressOutput: true }));
 }
 
-const KNOWN_HOOK_EVENTS = new Set(["session-start", "stop"]);
-
 function main() {
   const sub = process.argv.slice(2);
   if (sub.length === 0) sub.push("hook", "session-start");
-  else if (KNOWN_HOOK_EVENTS.has(sub[0])) sub.unshift("hook");
+  else if (sub[0] === "session-start") sub.unshift("hook");
 
   const runner = pickRunner();
   if (!runner) {

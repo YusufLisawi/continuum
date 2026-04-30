@@ -1,5 +1,5 @@
 {
-  "description": "Selfmind: inject SOUL/MEMORY/flashbacks at session start, plus a context-usage line after each assistant turn.",
+  "description": "Selfmind: inject SOUL, MEMORY, and recent flashback titles at session start.",
   "hooks": {
     "SessionStart": [
       {
@@ -10,18 +10,6 @@
             "shell": "bash",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/selfmind-hook.cjs\" session-start",
             "timeout": 15
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "shell": "bash",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/selfmind-hook.cjs\" stop",
-            "timeout": 5
           }
         ]
       }
