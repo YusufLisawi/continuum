@@ -39,43 +39,69 @@ every fresh session, every `/clear`, and every auto-compaction.
 
 ## Install
 
-Inside Claude Code, two commands. That's it.
+Pick the path that matches how you use the tool.
+
+### A. Claude Code plugin (recommended)
+
+Two commands inside Claude Code:
 
 ```
 /plugin marketplace add YusufLisawi/continuum
 /plugin install continuum@continuum
 ```
 
-The plugin auto-installs **everything** on first install:
+The plugin auto-installs **everything** — SessionStart hook, the
+`continuum` skill, deps, and a symlinked `continuum` CLI in
+`~/.bun/bin` (or `~/.local/bin`) so you can run it from any terminal.
+No manual `bun link`. No build step.
 
-- Registers the SessionStart hook (memory injection at every fresh
-  session, `/clear`, and auto-compaction)
-- Registers the `continuum` skill (with deep `references/` for recall /
-  remember / link workflows)
-- Runs `bun install` in the plugin cache
-- Symlinks the `continuum` CLI into `~/.bun/bin` (or `~/.local/bin`),
-  so you can run `continuum add`, `continuum search`, etc. from any
-  terminal — no manual `bun link` step
+### B. One-line CLI install (no plugin)
 
-**Requirement:** [`bun`](https://bun.sh) must be on your PATH. If it
-isn't, the Setup hook prints exactly how to fix it.
+For users who want just the CLI without the Claude Code integration:
 
-After install, in a fresh terminal:
+```sh
+curl -fsSL https://raw.githubusercontent.com/YusufLisawi/continuum/main/install.sh | bash
+```
+
+That clones the repo to `~/.local/share/continuum`, runs `bun install`,
+and symlinks `continuum` into a directory on your PATH. Override with
+env vars if you want it elsewhere:
+
+```sh
+CONTINUUM_DIR=~/code/continuum CONTINUUM_BIN=~/.local/bin \
+  curl -fsSL https://raw.githubusercontent.com/YusufLisawi/continuum/main/install.sh | bash
+```
+
+### C. Local development
+
+For working on continuum itself:
+
+```
+/plugin marketplace add /absolute/path/to/your/continuum/checkout
+/plugin install continuum@continuum
+```
+
+Then create a live-link symlink that points at your local source:
+
+```sh
+printf '#!/bin/sh\nexec bun "$HOME/Developer/continuum/src/bin.ts" "$@"\n' > ~/.bun/bin/continuum
+chmod +x ~/.bun/bin/continuum
+```
+
+Future `/plugin install continuum@continuum` runs **preserve** that
+dev symlink (the Setup hook detects symlinks pointing outside the
+plugin cache and leaves them alone). Edits to `src/` are picked up
+immediately — no rebuild.
+
+**Requirement:** [`bun`](https://bun.sh) must be on your PATH for any
+of the three paths above.
+
+### After install
 
 ```sh
 continuum init        # scaffold ~/.continuum/
 continuum --help
 ```
-
-For local development (no GitHub round-trip):
-
-```
-/plugin marketplace add /absolute/path/to/continuum
-/plugin install continuum@continuum
-```
-
-The CLI symlink points at the plugin's `src/bin.ts` directly — every
-edit to source is picked up immediately, no rebuild step.
 
 ---
 
