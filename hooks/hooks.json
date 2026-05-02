@@ -1,6 +1,19 @@
 {
-  "description": "Continuum: inject SOUL, MEMORY, and recent flashback titles at session start.",
+  "description": "Continuum: install CLI on plugin setup; inject SOUL/MEMORY/flashbacks at session start.",
   "hooks": {
+    "Setup": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/continuum-setup.sh\"",
+            "timeout": 180
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "matcher": "startup|clear|compact",

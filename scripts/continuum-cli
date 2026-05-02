@@ -1,0 +1,14 @@
+#!/bin/sh
+# Continuum CLI wrapper. Resolves to its own plugin root and execs src/bin.ts
+# via bun. Designed to be symlinked into ~/.bun/bin or ~/.local/bin.
+set -e
+SOURCE="$0"
+while [ -L "$SOURCE" ]; do
+  TARGET="$(readlink "$SOURCE")"
+  case "$TARGET" in
+    /*) SOURCE="$TARGET" ;;
+    *)  SOURCE="$(cd "$(dirname "$SOURCE")" && pwd)/$TARGET" ;;
+  esac
+done
+DIR="$(cd "$(dirname "$SOURCE")/.." && pwd)"
+exec bun "$DIR/src/bin.ts" "$@"

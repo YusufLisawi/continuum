@@ -37,42 +37,45 @@ every fresh session, every `/clear`, and every auto-compaction.
 
 ---
 
-## Install (CLI)
+## Install
 
-```sh
-git clone https://github.com/<your-user>/continuum ~/Developer/continuum
-cd ~/Developer/continuum
-bun install
-bun run build
-bun link
-continuum --help
-```
-
-Or live-linked (every source change is picked up without rebuilding):
-
-```sh
-printf '#!/bin/sh\nexec bun ~/Developer/continuum/src/bin.ts "$@"\n' > ~/.bun/bin/continuum
-chmod +x ~/.bun/bin/continuum
-```
-
-## Install (Claude Code plugin)
-
-Inside Claude Code:
+Inside Claude Code, two commands. That's it.
 
 ```
-/plugin marketplace add <your-user>/continuum
+/plugin marketplace add YusufLisawi/continuum
 /plugin install continuum@continuum
 ```
 
-For local development before pushing:
+The plugin auto-installs **everything** on first install:
+
+- Registers the SessionStart hook (memory injection at every fresh
+  session, `/clear`, and auto-compaction)
+- Registers the `continuum` skill (with deep `references/` for recall /
+  remember / link workflows)
+- Runs `bun install` in the plugin cache
+- Symlinks the `continuum` CLI into `~/.bun/bin` (or `~/.local/bin`),
+  so you can run `continuum add`, `continuum search`, etc. from any
+  terminal — no manual `bun link` step
+
+**Requirement:** [`bun`](https://bun.sh) must be on your PATH. If it
+isn't, the Setup hook prints exactly how to fix it.
+
+After install, in a fresh terminal:
+
+```sh
+continuum init        # scaffold ~/.continuum/
+continuum --help
+```
+
+For local development (no GitHub round-trip):
 
 ```
 /plugin marketplace add /absolute/path/to/continuum
 /plugin install continuum@continuum
 ```
 
-That wires the SessionStart hook and registers the `continuum` skill
-(with deep references for recall / remember / link). No further setup.
+The CLI symlink points at the plugin's `src/bin.ts` directly — every
+edit to source is picked up immediately, no rebuild step.
 
 ---
 
